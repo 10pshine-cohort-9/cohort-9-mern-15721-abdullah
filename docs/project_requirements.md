@@ -8,7 +8,7 @@ Full-stack web application allowing authenticated users to create, edit, and del
 
 ## Core Features
 1. **User Authentication & Authorization:** Sign up, log in, log out. Notes tied securely to authenticated users.
-2. **Note Management:** CRUD operations. Must include rich text editing.
+2. **Note Management:** CRUD operations. Must include rich text editing (Tiptap).
 3. **Application Logging:** Pino logger implemented across the app (events, errors, HTTP requests/responses, user activities).
 4. **Exception Handling:** Global middleware for graceful error handling. Errors logged via Pino.
 5. **Testing & QA:** Unit tests covering controllers, services, and data access layers.
