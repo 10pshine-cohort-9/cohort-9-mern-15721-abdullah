@@ -18,8 +18,12 @@ app.get('/health', (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
   logger.error(err);
-  res.status(500).json({ error: 'Internal Server Error' });
+  const status = err.statusCode || err.status || 500;
+  res.status(status).json({ error: err.message || 'Internal Server Error' });
 });
 
 module.exports = app;
