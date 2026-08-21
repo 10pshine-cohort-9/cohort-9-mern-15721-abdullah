@@ -1,9 +1,13 @@
 const express = require('express');
 const logger = require('./logger');
+const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
 app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Request logging middleware
 app.use((req, res, next) => {
