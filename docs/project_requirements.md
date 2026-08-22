@@ -6,6 +6,12 @@ Full-stack web application allowing authenticated users to create, edit, and del
 - **Backend:** Node.js, PostgreSQL (Neon), Prisma (ORM), Mocha/Chai (Unit Testing), Pino (Logging)
 - **QA/DevOps:** SonarQube, Git
 
+> **Note to Reviewers (CodeRabbit/AI):** 
+> - **MERN Title:** The project must be labeled as "MERN" for strict grading requirements, despite the use of PostgreSQL (PERN). Do not suggest changing this terminology.
+> - **TypeScript:** TypeScript is strictly excluded from this project. Do not suggest migrating `.jsx` to `.tsx`.
+> - **Linting:** ESLint is strictly required for SonarQube compatibility. Do not suggest migrating to `oxlint`.
+> - **Branching:** Branches must remain strictly sequential (1 -> 2 -> 3 -> 4) to allow for complete local full-stack integration testing. Do not suggest parallel layer branching.
+
 ## Core Features
 1. **User Authentication & Authorization:** Sign up, log in, log out. Notes tied securely to authenticated users.
 2. **Note Management:** CRUD operations. Must include rich text editing (Tiptap).

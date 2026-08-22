@@ -26,8 +26,12 @@ app.use((err, req, res, next) => {
     return next(err);
   }
   logger.error(err);
-  const status = err.statusCode || err.status || 500;
-  res.status(status).json({ error: err.message || 'Internal Server Error' });
+  const status = err.status || 500;
+  const message = status < 500 ? err.message : 'Internal Server Error';
+
+  res.status(status).json({
+    error: message
+  });
 });
 
 module.exports = app;
