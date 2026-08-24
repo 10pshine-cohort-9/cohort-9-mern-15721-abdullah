@@ -5,7 +5,7 @@ To match the expected PR size and structure of your cohort, you should break you
 Here is the revised, horizontally sliced roadmap:
 
 1. **Feature 1: Backend Base & Database:** Branch from: develop.
-Initialize Express, connect MySQL, and implement Pino Logger and Global Exception Handling.
+Initialize Express, connect PostgreSQL/Neon, and implement Pino Logger and Global Exception Handling.
 
 
 2. **Feature 2: Frontend Base Scaffold:** Branch from: feature-1.
@@ -28,8 +28,8 @@ Create the `Notes` table and write the secure CRUD APIs.
 Build the UI to fetch notes and the rich text editor to create/update them.
 
 
-7. **Feature 7: Unit Testing & SonarQube:** Branch from: feature-6.
-Add Mocha/Chai and Jest tests. Run the final SonarQube audit before submitting.
+7. **Feature 7: Unit Testing & SonarQube:** 
+Add Mocha/Chai (backend) and Jest (frontend) tests in horizontally sliced branches. Run the final SonarQube audit before submitting.
 
 
 This results in 7 smaller, highly focused PRs. It perfectly mirrors the scope your peers are using, making CodeRabbit's automated checks more accurate and Sir Tahir's manual review much faster.
