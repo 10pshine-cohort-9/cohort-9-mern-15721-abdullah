@@ -31,8 +31,15 @@ exports.register = async (req, res, next) => {
       }
     });
 
+    const token = jwt.sign(
+      { userId: user.id },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
     res.status(201).json({
       message: 'User registered successfully',
+      token,
       user: {
         id: user.id,
         email: user.email,
@@ -40,6 +47,9 @@ exports.register = async (req, res, next) => {
       }
     });
   } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Email already exists' });
+    }
     next(error);
   }
 };

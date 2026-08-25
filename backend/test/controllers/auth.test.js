@@ -65,11 +65,12 @@ describe('Auth Controller', () => {
       sinon.stub(bcrypt, 'genSalt').resolves('salt');
       sinon.stub(bcrypt, 'hash').resolves('hashedpassword');
       sinon.stub(prismaMock.user, 'create').resolves({ id: '1', email: 'test@example.com', name: 'Test' });
+      sinon.stub(jwt, 'sign').returns('valid.jwt.token');
 
       try {
         await authController.register(req, res, next);
         expect(res.status.calledWith(201)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'User registered successfully', user: { id: '1' } })).to.be.true;
+        expect(res.json.calledWithMatch({ message: 'User registered successfully', token: 'valid.jwt.token', user: { id: '1' } })).to.be.true;
       } catch (err) {
         expect.fail('Unexpected error: ' + err.message);
       }

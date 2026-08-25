@@ -40,8 +40,9 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Email Address</label>
+            <label htmlFor="email" className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Email Address</label>
             <input
+              id="email"
               type="email"
               required
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-200 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all"
@@ -52,8 +53,9 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Password</label>
             <input
+              id="password"
               type="password"
               required
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-200 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all"

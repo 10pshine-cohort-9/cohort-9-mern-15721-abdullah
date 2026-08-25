@@ -41,8 +41,9 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Full Name</label>
+            <label htmlFor="name" className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Full Name</label>
             <input
+              id="name"
               type="text"
               required
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-200 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all"
@@ -53,8 +54,9 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Email Address</label>
+            <label htmlFor="email" className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Email Address</label>
             <input
+              id="email"
               type="email"
               required
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-200 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all"
@@ -65,8 +67,9 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-white mb-1 drop-shadow-sm">Password</label>
             <input
+              id="password"
               type="password"
               required
               minLength="6"
