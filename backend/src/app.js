@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const logger = require('./logger');
 const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 // Routes
