@@ -65,6 +65,14 @@ exports.updateNote = async (req, res, next) => {
     const { id } = req.params;
     const { title, content } = req.body;
 
+    if (title === '' || content === '') {
+      return res.status(400).json({ error: 'Title and content cannot be empty' });
+    }
+
+    if (title === undefined && content === undefined) {
+      return res.status(400).json({ error: 'At least one field (title or content) is required to update' });
+    }
+
     const existingNote = await prisma.note.findUnique({
       where: { id }
     });
@@ -77,12 +85,13 @@ exports.updateNote = async (req, res, next) => {
       return res.status(403).json({ error: 'Unauthorized access to note' });
     }
 
+    const data = {};
+    if (title !== undefined) data.title = title;
+    if (content !== undefined) data.content = content;
+
     const note = await prisma.note.update({
       where: { id },
-      data: {
-        ...(title && { title }),
-        ...(content && { content })
-      }
+      data
     });
 
     res.status(200).json({

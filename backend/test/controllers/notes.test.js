@@ -106,8 +106,29 @@ describe('Notes Controller', () => {
   });
 
   describe('updateNote', () => {
+    it('should return 400 if title or content is empty string', async () => {
+      req.params = { id: 'note-1' };
+      req.body = { title: '' };
+
+      await notesController.updateNote(req, res, next);
+
+      expect(res.status.calledWith(400)).to.be.true;
+      expect(res.json.calledWith({ error: 'Title and content cannot be empty' })).to.be.true;
+    });
+
+    it('should return 400 if neither title nor content is provided', async () => {
+      req.params = { id: 'note-1' };
+      req.body = {};
+
+      await notesController.updateNote(req, res, next);
+
+      expect(res.status.calledWith(400)).to.be.true;
+      expect(res.json.calledWith({ error: 'At least one field (title or content) is required to update' })).to.be.true;
+    });
+
     it('should return 404 if note not found', async () => {
       req.params = { id: 'missing' };
+      req.body = { title: 'Valid Title' };
       sinon.stub(prismaMock.note, 'findUnique').resolves(null);
 
       await notesController.updateNote(req, res, next);
@@ -117,6 +138,7 @@ describe('Notes Controller', () => {
 
     it('should return 403 if updating another users note', async () => {
       req.params = { id: 'note-1' };
+      req.body = { title: 'Valid Title' };
       sinon.stub(prismaMock.note, 'findUnique').resolves({ id: 'note-1', userId: 'other-user' });
 
       await notesController.updateNote(req, res, next);
