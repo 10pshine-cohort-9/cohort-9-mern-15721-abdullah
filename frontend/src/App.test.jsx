@@ -1,8 +1,19 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders App successfully', () => {
+// Mock the axios api service to avoid import.meta errors in Jest
+jest.mock('./services/api', () => ({
+  post: jest.fn(),
+  interceptors: {
+    request: { use: jest.fn() },
+    response: { use: jest.fn() }
+  }
+}));
+
+test('renders App and redirects to login when unauthenticated', () => {
   render(<App />);
-  const heading = screen.getByText(/Notes App Frontend/i);
+  // When unauthenticated, ProtectedRoute redirects to /login, which renders the Login form
+  const heading = screen.getByText(/Welcome Back/i);
   expect(heading).toBeInTheDocument();
 });

@@ -1,9 +1,15 @@
 const express = require('express');
+const cors = require('cors');
 const logger = require('./logger');
+const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -22,8 +28,12 @@ app.use((err, req, res, next) => {
     return next(err);
   }
   logger.error(err);
-  const status = err.statusCode || err.status || 500;
-  res.status(status).json({ error: err.message || 'Internal Server Error' });
+  const status = err.status || 500;
+  const message = status < 500 ? err.message : 'Internal Server Error';
+
+  res.status(status).json({
+    error: message
+  });
 });
 
 module.exports = app;

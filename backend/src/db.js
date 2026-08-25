@@ -1,0 +1,13 @@
+const { Pool } = require('pg');
+const { PrismaPg } = require('@prisma/adapter-pg');
+const { PrismaClient } = require('@prisma/client');
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('FATAL ERROR: DATABASE_URL is not defined.');
+}
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
+
+module.exports = prisma;
