@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const logger = require('./logger');
 const authRoutes = require('./routes/auth.routes');
+const notesRoutes = require('./routes/notes.routes');
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/notes', notesRoutes);
 
 // Request logging middleware
 app.use((req, res, next) => {
