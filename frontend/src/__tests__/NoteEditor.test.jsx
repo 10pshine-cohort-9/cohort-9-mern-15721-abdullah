@@ -13,6 +13,12 @@ jest.mock('../services/api', () => ({
   interceptors: { request: { use: jest.fn() }, response: { use: jest.fn() } }
 }));
 
+jest.mock('../components/RichTextEditor', () => {
+  return function MockRichTextEditor({ content, onChange }) {
+    return <textarea data-testid="mock-editor" value={content} onChange={e => onChange(e.target.value)} />;
+  };
+});
+
 const mockUser = { id: '1', name: 'Test User', email: 'test@example.com' };
 
 beforeEach(() => {
@@ -66,19 +72,20 @@ describe('NoteEditor Component', () => {
     const titleInput = screen.getByLabelText('Note Title');
     fireEvent.change(titleInput, { target: { value: 'New Test Note' } });
 
-    // For Tiptap, content is tricky to mock easily in JSDOM, but we can bypass or set it by finding the contenteditable div
-    const editorElement = document.querySelector('.ProseMirror');
-    if (editorElement) {
-      editorElement.innerHTML = '<p>Editor content</p>';
-      fireEvent.input(editorElement);
-    }
+    const editorInput = screen.getByTestId('mock-editor');
+    fireEvent.change(editorInput, { target: { value: '<p>Editor content</p>' } });
 
-    // However, since tiptap internal state might not update from just innerHTML, 
-    // let's simulate the API call with whatever state we have or bypass deep content validation in this UI test 
-    // Wait, the component checks `if (!title.trim() || !content.trim())`. 
-    // We can mock the component or just assume we managed to type into it. 
-    // Let's just bypass the content check for the test by mocking api.post directly, but we need to pass validation.
-    // Instead, a better approach for JSDOM Tiptap testing is tough. We will just test the error state and api call.
+    const saveButton = screen.getByRole('button', { name: /save note/i });
+    fireEvent.submit(saveButton.closest('form'));
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/notes', {
+        title: 'New Test Note',
+        content: '<p>Editor content</p>'
+      });
+      // Verifying it redirected to Dashboard ("/")
+      expect(screen.getByTestId('dashboard-page')).toBeInTheDocument();
+    });
   });
 
   it('loads note data in edit mode', async () => {

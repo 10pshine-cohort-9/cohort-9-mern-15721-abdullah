@@ -30,7 +30,7 @@ const Dashboard = () => {
     if (!window.confirm('Are you sure you want to delete this note?')) return;
     try {
       await api.delete(`/notes/${id}`);
-      setNotes(notes.filter(note => note.id !== id));
+      setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
     } catch (err) {
       setError('Failed to delete note. Please try again.');
     }
@@ -109,7 +109,14 @@ const Dashboard = () => {
                 className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col h-64"
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleCardClick(note.id); }}
+                onKeyDown={(e) => {
+                  // Ignore events that bubble up from child buttons
+                  if (e.target.tagName.toLowerCase() === 'button') return;
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCardClick(note.id);
+                  }
+                }}
               >
                 <div className="p-5 flex-grow overflow-hidden">
                   <h3 className="text-lg font-medium text-gray-900 truncate mb-2">{note.title}</h3>

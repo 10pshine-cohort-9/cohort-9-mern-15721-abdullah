@@ -37,7 +37,8 @@ const NoteEditor = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) {
+    const plainTextContent = content.replace(/<[^>]*>/g, '').trim();
+    if (!title.trim() || !plainTextContent) {
       setError('Title and content are required.');
       return;
     }

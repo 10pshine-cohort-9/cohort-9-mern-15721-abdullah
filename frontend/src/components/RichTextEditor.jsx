@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
@@ -94,6 +95,15 @@ const RichTextEditor = ({ content, onChange }) => {
       <EditorContent editor={editor} />
     </div>
   );
+};
+
+MenuBar.propTypes = {
+  editor: PropTypes.object,
+};
+
+RichTextEditor.propTypes = {
+  content: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default RichTextEditor;
