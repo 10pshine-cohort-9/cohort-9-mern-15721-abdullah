@@ -57,6 +57,14 @@ export const AuthProvider = ({ children }) => {
     return response.data;
   };
 
+  const updateProfile = async (name) => {
+    const response = await api.put('/auth/profile', { name });
+    const { user: updatedUser } = response.data;
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    return response.data;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -68,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    updateProfile,
     logout
   };
 

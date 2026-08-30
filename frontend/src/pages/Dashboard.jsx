@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import ProfileDropdown from '../components/ProfileDropdown';
 
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
@@ -55,13 +56,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <h1 className="text-xl font-semibold text-gray-900">Notes Dashboard</h1>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">{user?.name}</span>
-            <button 
-              onClick={logout}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              Log out
-            </button>
+            <ProfileDropdown />
           </div>
         </div>
       </header>

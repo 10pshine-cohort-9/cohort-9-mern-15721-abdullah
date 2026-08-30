@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import RichTextEditor from '../components/RichTextEditor';
 import { useAuth } from '../context/AuthContext';
+import ProfileDropdown from '../components/ProfileDropdown';
 
 const NoteEditor = () => {
   const { id } = useParams();
@@ -95,7 +96,7 @@ const NoteEditor = () => {
             &larr; Back to Dashboard
           </Link>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">{user?.name}</span>
+            <ProfileDropdown />
           </div>
         </div>
       </header>
