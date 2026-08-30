@@ -84,9 +84,6 @@ describe('Dashboard Component', () => {
     api.get.mockResolvedValueOnce({ data: { notes: mockNotes } });
     api.delete.mockResolvedValueOnce({});
     
-    // Mock window.confirm
-    const confirmSpy = jest.spyOn(window, 'confirm').mockImplementation(() => true);
-
     renderDashboard();
 
     await waitFor(() => {
@@ -96,10 +93,15 @@ describe('Dashboard Component', () => {
     fireEvent.click(screen.getByTestId('delete-note-1'));
 
     await waitFor(() => {
+      expect(screen.getByTestId('confirm-delete-button')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('confirm-delete-button'));
+
+    await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith('/notes/1');
       expect(screen.queryByText('First Note')).not.toBeInTheDocument();
     });
 
-    confirmSpy.mockRestore();
   });
 });

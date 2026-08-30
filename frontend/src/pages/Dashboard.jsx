@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import ProfileDropdown from '../components/ProfileDropdown';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [noteToDelete, setNoteToDelete] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -25,14 +27,15 @@ const Dashboard = () => {
     }
   };
 
-  const handleDelete = async (e, id) => {
-    e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this note?')) return;
+  const handleDelete = async () => {
+    if (!noteToDelete) return;
     try {
-      await api.delete(`/notes/${id}`);
-      setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
+      await api.delete(`/notes/${noteToDelete.id}`);
+      setNotes(prevNotes => prevNotes.filter(note => note.id !== noteToDelete.id));
     } catch {
       setError('Failed to delete note. Please try again.');
+    } finally {
+      setNoteToDelete(null);
     }
   };
 
@@ -61,6 +64,12 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <DeleteConfirmModal
+          isOpen={!!noteToDelete}
+          onClose={() => setNoteToDelete(null)}
+          onConfirm={handleDelete}
+          title={noteToDelete?.title}
+        />
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 sm:gap-0">
           <h2 className="text-2xl font-bold text-gray-900">Your Notes</h2>
           <div className="flex space-x-4 items-center w-full sm:w-auto">
@@ -69,11 +78,11 @@ const Dashboard = () => {
               placeholder="Search notes..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-grow sm:flex-grow-0 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="flex-grow sm:flex-grow-0 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
             />
             <Link
               to="/note/new"
-              className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-medium text-sm text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors shrink-0"
+              className="inline-flex items-center px-4 py-2 bg-teal-600 border border-transparent rounded-md font-medium text-sm text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors shrink-0"
             >
               Create Note
             </Link>
@@ -134,7 +143,7 @@ const Dashboard = () => {
                 <Link 
                   key={note.id}
                   to={`/note/edit/${note.id}`}
-                  className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col h-64 block"
+                  className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-teal-300 transition-all cursor-pointer flex flex-col h-64 block"
                 >
                   <div className="p-5 flex-grow overflow-hidden">
                     <h3 className="text-lg font-medium text-gray-900 truncate mb-2">{note.title}</h3>
@@ -152,7 +161,8 @@ const Dashboard = () => {
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
-                        handleDelete(e, note.id);
+                        e.stopPropagation();
+                        setNoteToDelete(note);
                       }}
                       className="text-sm font-medium text-red-600 hover:text-red-900 z-10 relative"
                       data-testid={`delete-note-${note.id}`}
