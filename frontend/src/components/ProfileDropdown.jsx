@@ -27,6 +27,7 @@ const ProfileDropdown = () => {
     <>
       <div className="relative" ref={dropdownRef}>
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center space-x-2.5 p-1.5 pr-4 rounded-full hover:bg-gray-100 focus:outline-none transition-colors border border-transparent hover:border-gray-200"
         >
@@ -46,6 +47,7 @@ const ProfileDropdown = () => {
             </div>
             
             <button
+              type="button"
               onClick={openModal}
               className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             >
@@ -59,6 +61,7 @@ const ProfileDropdown = () => {
             <div className="my-1 border-t border-gray-100"></div>
 
             <button
+              type="button"
               onClick={logout}
               className="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 transition-colors"
             >

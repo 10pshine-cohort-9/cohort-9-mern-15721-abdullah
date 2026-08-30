@@ -41,6 +41,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
           <button 
+            type="button"
             onClick={onClose}
             className="text-gray-400 hover:text-gray-500 transition-colors focus:outline-none"
           >
@@ -70,8 +71,9 @@ const ProfileModal = ({ isOpen, onClose }) => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
             <input
+              id="email"
               type="email"
               value={user?.email || ''}
               disabled

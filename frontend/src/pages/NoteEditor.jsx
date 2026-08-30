@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import RichTextEditor from '../components/RichTextEditor';
-import { useAuth } from '../context/AuthContext';
 import ProfileDropdown from '../components/ProfileDropdown';
 
 const NoteEditor = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -28,7 +26,7 @@ const NoteEditor = () => {
           setTitle(response.data.note.title);
           setContent(response.data.note.content);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
           setError('Failed to load note.');
         }
@@ -55,7 +53,8 @@ const NoteEditor = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const plainTextContent = content.replace(/<[^>]*>/g, '').trim();
+    const doc = new DOMParser().parseFromString(content, 'text/html');
+    const plainTextContent = (doc.body.textContent || '').trim();
     if (!title.trim() || !plainTextContent) {
       setError('Title and content are required.');
       return;
@@ -131,10 +130,12 @@ const NoteEditor = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
                 Note Content
               </label>
-              <RichTextEditor content={content} onChange={setContent} />
+              <div id="content">
+                <RichTextEditor content={content} onChange={setContent} />
+              </div>
             </div>
 
             <div className="flex justify-end space-x-4 pt-4 border-t border-gray-100">

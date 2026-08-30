@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext();
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       if (token && storedUser) {
         setUser(JSON.parse(storedUser));
       }
-    } catch (e) {
+    } catch {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     } finally {
@@ -71,14 +71,14 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     loading,
     login,
     register,
     updateProfile,
     logout
-  };
+  }), [user, loading]);
 
   return (
     <AuthContext.Provider value={value}>

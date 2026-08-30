@@ -6,7 +6,8 @@ const notesRoutes = require('./routes/notes.routes');
 
 const app = express();
 
-app.use(cors());
+app.disable('x-powered-by');
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 // Routes

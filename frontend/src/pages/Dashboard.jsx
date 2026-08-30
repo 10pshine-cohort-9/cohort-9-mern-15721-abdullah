@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
 import ProfileDropdown from '../components/ProfileDropdown';
 
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -21,7 +18,7 @@ const Dashboard = () => {
     try {
       const response = await api.get('/notes');
       setNotes(response.data.notes);
-    } catch (err) {
+    } catch {
       setError('Failed to load notes. Please try again later.');
     } finally {
       setLoading(false);
@@ -34,18 +31,19 @@ const Dashboard = () => {
     try {
       await api.delete(`/notes/${id}`);
       setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
-    } catch (err) {
+    } catch {
       setError('Failed to delete note. Please try again.');
     }
   };
 
-  const handleCardClick = (id) => {
-    navigate(`/note/edit/${id}`);
+  const stripHtml = (html) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || '';
   };
 
   const filteredNotes = notes.filter(note => {
     const query = searchQuery.toLowerCase();
-    const plainContent = note.content.replace(/<[^>]+>/g, ' ').toLowerCase();
+    const plainContent = stripHtml(note.content).toLowerCase();
     return note.title.toLowerCase().includes(query) || plainContent.includes(query);
   });
 
@@ -88,79 +86,85 @@ const Dashboard = () => {
           </div>
         )}
 
-        {loading ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" data-testid="loading-indicator">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col h-64 animate-pulse">
-                <div className="p-5 flex-grow">
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded"></div>
-                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                    <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+        {(() => {
+          if (loading) {
+            return (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" data-testid="loading-indicator">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col h-64 animate-pulse">
+                    <div className="p-5 flex-grow">
+                      <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                        <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+                      </div>
+                    </div>
+                    <div className="px-5 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg flex justify-between">
+                      <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                    </div>
                   </div>
-                </div>
-                <div className="px-5 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg flex justify-between">
-                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/6"></div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : notes.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No notes</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by creating a new note.</p>
-          </div>
-        ) : filteredNotes.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No matches found</h3>
-            <p className="mt-1 text-sm text-gray-500">Try adjusting your search query.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredNotes.map((note) => (
-              <div 
-                key={note.id}
-                onClick={() => handleCardClick(note.id)}
-                className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col h-64"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  // Ignore events that bubble up from child buttons
-                  if (e.target.tagName.toLowerCase() === 'button') return;
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleCardClick(note.id);
-                  }
-                }}
-              >
-                <div className="p-5 flex-grow overflow-hidden">
-                  <h3 className="text-lg font-medium text-gray-900 truncate mb-2">{note.title}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-wrap">
-                    {note.content
-                      .replace(/<\/p>|<br\s*\/?>|<\/li>|<\/h[1-6]>/gi, '\n')
-                      .replace(/<[^>]+>/g, '')
-                      .replace(/\n\s*\n/g, '\n')
-                      .trim()}
-                  </p>
-                </div>
-                <div className="px-5 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center rounded-b-lg">
-                  <span className="text-xs text-gray-500">
-                    {new Date(note.createdAt).toLocaleDateString()}
-                  </span>
-                  <button
-                    onClick={(e) => handleDelete(e, note.id)}
-                    className="text-sm font-medium text-red-600 hover:text-red-900"
-                    data-testid={`delete-note-${note.id}`}
-                  >
-                    Delete
-                  </button>
-                </div>
+            );
+          }
+          
+          if (notes.length === 0) {
+            return (
+              <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No notes</h3>
+                <p className="mt-1 text-sm text-gray-500">Get started by creating a new note.</p>
               </div>
-            ))}
-          </div>
-        )}
+            );
+          }
+          
+          if (filteredNotes.length === 0) {
+            return (
+              <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No matches found</h3>
+                <p className="mt-1 text-sm text-gray-500">Try adjusting your search query.</p>
+              </div>
+            );
+          }
+          
+          return (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredNotes.map((note) => (
+                <Link 
+                  key={note.id}
+                  to={`/note/edit/${note.id}`}
+                  className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col h-64 block"
+                >
+                  <div className="p-5 flex-grow overflow-hidden">
+                    <h3 className="text-lg font-medium text-gray-900 truncate mb-2">{note.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-wrap">
+                      {stripHtml(note.content
+                        .replace(/<\/p>|<br\s*\/?>|<\/li>|<\/h[1-6]>/gi, '\n')
+                        .replace(/\n\s*\n/g, '\n'))}
+                    </p>
+                  </div>
+                  <div className="px-5 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center rounded-b-lg">
+                    <span className="text-xs text-gray-500">
+                      {new Date(note.createdAt).toLocaleDateString()}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleDelete(e, note.id);
+                      }}
+                      className="text-sm font-medium text-red-600 hover:text-red-900 z-10 relative"
+                      data-testid={`delete-note-${note.id}`}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          );
+        })()}
       </main>
     </div>
   );
