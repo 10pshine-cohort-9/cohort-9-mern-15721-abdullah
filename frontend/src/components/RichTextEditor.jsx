@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
@@ -75,6 +75,11 @@ const MenuBar = ({ editor }) => {
 };
 
 const RichTextEditor = ({ content, onChange }) => {
+  // Track the last externally-set content to avoid re-render loops.
+  // Only call setContent when the prop genuinely changes from the parent
+  // (e.g. after an API fetch), not on every keystroke.
+  const lastExternalContent = useRef(content);
+
   const editor = useEditor({
     extensions: [StarterKit],
     content,
@@ -88,9 +93,9 @@ const RichTextEditor = ({ content, onChange }) => {
     },
   });
 
-  // Effect to update content when the prop changes (e.g., loaded from API)
   React.useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
+    if (editor && content !== lastExternalContent.current) {
+      lastExternalContent.current = content;
       editor.commands.setContent(content);
     }
   }, [content, editor]);

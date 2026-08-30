@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,6 +8,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchNotes();
@@ -24,18 +25,23 @@ const Dashboard = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
     if (!window.confirm('Are you sure you want to delete this note?')) return;
     try {
       await api.delete(`/notes/${id}`);
       setNotes(notes.filter(note => note.id !== id));
     } catch (err) {
-      alert('Failed to delete note');
+      setError('Failed to delete note. Please try again.');
     }
   };
 
+  const handleCardClick = (id) => {
+    navigate(`/note/edit/${id}`);
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -58,7 +64,7 @@ const Dashboard = () => {
           <h2 className="text-2xl font-bold text-gray-900">Your Notes</h2>
           <Link
             to="/note/new"
-            className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-medium text-sm text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
           >
             Create Note
           </Link>
@@ -83,8 +89,12 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {notes.map((note) => (
               <div 
-                key={note.id} 
-                className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow flex flex-col h-64"
+                key={note.id}
+                onClick={() => handleCardClick(note.id)}
+                className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col h-64"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleCardClick(note.id); }}
               >
                 <div className="p-5 flex-grow overflow-hidden">
                   <h3 className="text-lg font-medium text-gray-900 truncate mb-2">{note.title}</h3>
@@ -97,21 +107,13 @@ const Dashboard = () => {
                   <span className="text-xs text-gray-500">
                     {new Date(note.createdAt).toLocaleDateString()}
                   </span>
-                  <div className="space-x-3">
-                    <Link
-                      to={`/note/edit/${note.id}`}
-                      className="text-sm font-medium text-indigo-600 hover:text-indigo-900"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(note.id)}
-                      className="text-sm font-medium text-red-600 hover:text-red-900"
-                      data-testid={`delete-note-${note.id}`}
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <button
+                    onClick={(e) => handleDelete(e, note.id)}
+                    className="text-sm font-medium text-red-600 hover:text-red-900"
+                    data-testid={`delete-note-${note.id}`}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
