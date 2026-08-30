@@ -113,10 +113,13 @@ const Dashboard = () => {
               >
                 <div className="p-5 flex-grow overflow-hidden">
                   <h3 className="text-lg font-medium text-gray-900 truncate mb-2">{note.title}</h3>
-                  <div 
-                    className="prose prose-sm text-gray-600 line-clamp-4"
-                    dangerouslySetInnerHTML={{ __html: note.content }}
-                  />
+                  <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-wrap">
+                    {note.content
+                      .replace(/<\/p>|<br\s*\/?>|<\/li>|<\/h[1-6]>/gi, '\n')
+                      .replace(/<[^>]+>/g, '')
+                      .replace(/\n\s*\n/g, '\n')
+                      .trim()}
+                  </p>
                 </div>
                 <div className="px-5 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center rounded-b-lg">
                   <span className="text-xs text-gray-500">

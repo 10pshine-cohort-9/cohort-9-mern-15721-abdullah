@@ -75,11 +75,6 @@ const MenuBar = ({ editor }) => {
 };
 
 const RichTextEditor = ({ content, onChange }) => {
-  // Track the last externally-set content to avoid re-render loops.
-  // Only call setContent when the prop genuinely changes from the parent
-  // (e.g. after an API fetch), not on every keystroke.
-  const lastExternalContent = useRef(content);
-
   const editor = useEditor({
     extensions: [StarterKit],
     content,
@@ -92,13 +87,6 @@ const RichTextEditor = ({ content, onChange }) => {
       onChange(editor.getHTML());
     },
   });
-
-  React.useEffect(() => {
-    if (editor && content !== lastExternalContent.current) {
-      lastExternalContent.current = content;
-      editor.commands.setContent(content);
-    }
-  }, [content, editor]);
 
   return (
     <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden bg-white">
