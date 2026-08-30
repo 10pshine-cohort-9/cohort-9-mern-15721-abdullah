@@ -18,22 +18,39 @@ const NoteEditor = () => {
   const isEditMode = !!id;
 
   useEffect(() => {
-    if (isEditMode) {
-      fetchNote();
-    }
-  }, [id]);
+    let isMounted = true;
 
-  const fetchNote = async () => {
-    try {
-      const response = await api.get(`/notes/${id}`);
-      setTitle(response.data.note.title);
-      setContent(response.data.note.content);
-    } catch (err) {
-      setError('Failed to load note.');
-    } finally {
+    const fetchNote = async () => {
+      try {
+        const response = await api.get(`/notes/${id}`);
+        if (isMounted) {
+          setTitle(response.data.note.title);
+          setContent(response.data.note.content);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError('Failed to load note.');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    if (isEditMode) {
+      setLoading(true);
+      fetchNote();
+    } else {
+      setTitle('');
+      setContent('');
       setLoading(false);
     }
-  };
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id, isEditMode]);
 
   const handleSave = async (e) => {
     e.preventDefault();

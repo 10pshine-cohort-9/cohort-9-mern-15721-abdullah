@@ -23,6 +23,20 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
+
+    const handleUnauthorized = () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    };
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
   }, []);
 
   const login = async (email, password) => {
