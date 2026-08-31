@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext();
@@ -17,12 +17,26 @@ export const AuthProvider = ({ children }) => {
       if (token && storedUser) {
         setUser(JSON.parse(storedUser));
       }
-    } catch (e) {
+    } catch {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     } finally {
       setLoading(false);
     }
+
+    const handleUnauthorized = () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    };
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
   }, []);
 
   const login = async (email, password) => {
@@ -43,19 +57,28 @@ export const AuthProvider = ({ children }) => {
     return response.data;
   };
 
+  const updateProfile = async (name) => {
+    const response = await api.put('/auth/profile', { name });
+    const { user: updatedUser } = response.data;
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    return response.data;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
   };
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     loading,
     login,
     register,
+    updateProfile,
     logout
-  };
+  }), [user, loading]);
 
   return (
     <AuthContext.Provider value={value}>

@@ -44,17 +44,17 @@ describe('Dashboard Component', () => {
     expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
   });
 
-  it('renders empty state when no notes exist', async () => {
+  it('renders empty state when no notes exist', () => {
     api.get.mockResolvedValueOnce({ data: { notes: [] } });
     renderDashboard();
 
-    await waitFor(() => {
+    return waitFor(() => {
       expect(screen.getByText('No notes')).toBeInTheDocument();
       expect(screen.getByText('Get started by creating a new note.')).toBeInTheDocument();
     });
   });
 
-  it('renders notes successfully', async () => {
+  it('renders notes successfully', () => {
     const mockNotes = [
       { id: '1', title: 'First Note', content: '<p>Content 1</p>', createdAt: '2023-01-01T00:00:00.000Z' },
       { id: '2', title: 'Second Note', content: '<p>Content 2</p>', createdAt: '2023-01-02T00:00:00.000Z' }
@@ -62,17 +62,17 @@ describe('Dashboard Component', () => {
     api.get.mockResolvedValueOnce({ data: { notes: mockNotes } });
     renderDashboard();
 
-    await waitFor(() => {
+    return waitFor(() => {
       expect(screen.getByText('First Note')).toBeInTheDocument();
       expect(screen.getByText('Second Note')).toBeInTheDocument();
     });
   });
 
-  it('displays error message when API fails', async () => {
+  it('displays error message when API fails', () => {
     api.get.mockRejectedValueOnce(new Error('Network error'));
     renderDashboard();
 
-    await waitFor(() => {
+    return waitFor(() => {
       expect(screen.getByText('Failed to load notes. Please try again later.')).toBeInTheDocument();
     });
   });
@@ -84,9 +84,6 @@ describe('Dashboard Component', () => {
     api.get.mockResolvedValueOnce({ data: { notes: mockNotes } });
     api.delete.mockResolvedValueOnce({});
     
-    // Mock window.confirm
-    const confirmSpy = jest.spyOn(window, 'confirm').mockImplementation(() => true);
-
     renderDashboard();
 
     await waitFor(() => {
@@ -96,10 +93,15 @@ describe('Dashboard Component', () => {
     fireEvent.click(screen.getByTestId('delete-note-1'));
 
     await waitFor(() => {
+      expect(screen.getByTestId('confirm-delete-button')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('confirm-delete-button'));
+
+    await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith('/notes/1');
       expect(screen.queryByText('First Note')).not.toBeInTheDocument();
     });
 
-    confirmSpy.mockRestore();
   });
 });

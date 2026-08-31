@@ -11,7 +11,7 @@ const MenuBar = ({ editor }) => {
   const btnClass = (isActive) =>
     `px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
       isActive
-        ? 'bg-indigo-100 text-indigo-700'
+        ? 'bg-teal-100 text-teal-700'
         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
     }`;
 
