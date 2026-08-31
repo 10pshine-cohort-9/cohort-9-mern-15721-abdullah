@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const notesController = require('../controllers/notes.controller');
-const authMiddleware = require('../middleware/auth.middleware');
+const { verifyToken } = require('../middleware/auth.middleware');
 
 // All notes routes require authentication
-router.use(authMiddleware);
+router.use(verifyToken);
 
 router.post('/', notesController.createNote);
 router.get('/', notesController.getNotes);
